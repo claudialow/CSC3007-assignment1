@@ -1,23 +1,38 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title> Carpark Lots </title>
-    </head>
+        <title> Assignment 1</title>
+        <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</head>
 <body>
 
-<h1>Lab 3: Carpark Utilization Table</h1>
+<h1>Assignment 1</h1>
 
 <p></p>
-<div id = "main"> </div>
-<table id="lots" border="1">
-    <thead>
+<div id = "main" class="mx-5"> 
+<p id="update"></p>
+<table id="lots" border="1" class="table">
+    <thead class="thead-dark">
         <tr>
-            <th>Carpark Number</th>
-            <th>Timestamp</th>
-            <th>Lot Type</th>
-            <th>Total Lots</th>
-            <th>Lot availability</th>
-            <th>Utilization</th>
+            <th>Metrics</th>
+            <th>National</th>
+            <th>Central</th>
+            <th>West</th>
+            <th>East</th>
+            <th>North</th>
+            <th>South</th>
         </tr>
     </thead>
     <tbody>
@@ -25,13 +40,14 @@
     </tbody>
     
 </table>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     
 let myData = {};
-    
-fetch('https://api.data.gov.sg/v1/transport/carpark-availability')
+console.log("testing");
+fetch('https://api.data.gov.sg/v1/environment/psi')
     .then(response => response.json())
     .then(data => {
         myData = data;
@@ -39,24 +55,30 @@ fetch('https://api.data.gov.sg/v1/transport/carpark-availability')
         sortData(myData);
     }); 
 
-
-function sortData(data) {
-    var out = '', total, lotTotal, lotAva;
     
+function sortData(data) {
+    var out = '', datetime, datetimeout;
 
-    total = data.items[0].carpark_data.length;
+    console.log(data.items[0].update_timestamp);
+    datetime = (data.items[0].update_timestamp).split("T");
+    document.getElementById("update").innerHTML = datetime[1]; 
 
-    for (i = 0; i < total; i++) {
-        lotTotal = data.items[0].carpark_data[i].carpark_info[0].total_lots;
-        lotAva = data.items[0].carpark_data[i].carpark_info[0].lots_available;
-        out += "<tr><td>" 
-            + data.items[0].carpark_data[i].carpark_number + "</td><td>" 
-            + data.items[0].carpark_data[i].update_datetime + "</td><td>"
-            + data.items[0].carpark_data[i].carpark_info[0].lot_type + "</td><td>"
-            + data.items[0].carpark_data[i].carpark_info[0].total_lots + "</td><td>"
-            + data.items[0].carpark_data[i].carpark_info[0].lots_available + "</td><td>" 
-            + Math.ceil(((lotTotal-lotAva)/lotTotal)*100); 
-            + "</td></tr>"
+    total = Object.keys(data.items[0].readings).length;
+    console.log(total);
+    
+    for (const [key, value] of Object.entries(data.items[0].readings)) {
+        console.log(key);
+        console.log(value);
+        console.log(value["west"]);
+        out += "<tr><td>"
+            + key + "</td><td>"
+            + value["national"] + "</td><td>"
+            + value["central"] + "</td><td>"
+            + value["west"] + "</td><td>"
+            + value["east"] + "</td><td>"
+            + value["north"] + "</td><td>"
+            + value["south"]+ "</td>"
+            + "</tr>"
     }
 
     $('tbody').append(out);
